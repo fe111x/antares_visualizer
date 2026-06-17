@@ -1,0 +1,9 @@
+# Root folder with one subdirectory per Antares run (e.g. data/run_AT/).
+# Relative paths resolve from the project root; absolute paths are supported.
+runs_root: data
+
+# Optional per-run overrides when parquet/csv files live in a nested folder.
+# Any subfolder under runs_root is auto-discovered even if not listed here.
+runs:
+  run_AT:
+    data_path: .

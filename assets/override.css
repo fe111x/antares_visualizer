@@ -1,0 +1,15 @@
+/* Tighter Remove Trace button for inline placement */
+#remove-trace {
+  width: 120px !important;
+  max-width: 100% !important;
+  display: inline-block !important;
+}
+
+/* Ensure compact date-range shows its calendar icon inside the control */
+.compact-date-range .DateRangePickerInput {
+  box-sizing: border-box;
+  overflow: visible;
+}
+.compact-date-range .DateInput_input {
+  padding-right: 28px;
+}

@@ -1,0 +1,161 @@
+.loading-progress-track {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: #d5dfea;
+  overflow: hidden;
+  position: relative;
+}
+
+.loading-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 42%;
+  min-width: 88px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(135deg, #93a8bc 0 10px, #7890a6 10px 20px);
+  background-size: 180% 100%;
+  animation: indeterminate-slide 1.05s linear infinite, loading-stripes 0.75s linear infinite;
+}
+
+.loading-spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #c4d1de;
+  border-top-color: #6f879e;
+  animation: loading-spin 0.7s linear infinite;
+}
+
+@keyframes indeterminate-slide {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+@keyframes loading-stripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 36px 0;
+  }
+}
+
+@keyframes loading-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.action-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.action-button-secondary:hover:not(:disabled) {
+  background: #e2e8f0 !important;
+}
+
+.action-button-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+#remove-trace-select {
+  min-width: 320px;
+}
+
+#readiness-banner {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#readiness-banner[data-ready="true"] {
+  background: #ecfdf3;
+  border-color: #86efac;
+}
+
+#control-section[data-ready="false"] {
+  opacity: 0.72;
+}
+
+.compact-date-range {
+  width: 100%;
+  min-width: 0;
+  font-size: 11px;
+}
+
+.compact-date-range .DateRangePicker,
+.compact-date-range .DateRangePickerInput,
+.compact-date-range .DateInput,
+.compact-date-range .DateInput_input,
+.compact-date-range input {
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+}
+
+.compact-date-range .DateRangePickerInput {
+  height: 34px;
+  min-height: 34px;
+  border: 1px solid #c7d3e0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.compact-date-range .DateInput {
+  width: 44%;
+  max-width: 44%;
+}
+
+.compact-date-range .DateInput,
+.compact-date-range .DateInput_input {
+  height: 32px;
+}
+
+.compact-date-range .DateInput_input {
+  padding: 0 4px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.compact-date-range .DateRangePickerInput_arrow {
+  padding: 0 2px;
+  font-size: 10px;
+}
+
+#date-range input,
+#date-range .DateInput_input {
+  font-size: 11px !important;
+}
+
+.date-range-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.compact-date-range .DateRangePicker,
+.compact-date-range .DateRangePickerInput {
+  width: 100%;
+}
+
+.date-range-row button {
+  flex-shrink: 0;
+}
