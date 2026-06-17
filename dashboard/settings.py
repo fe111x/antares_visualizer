@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -14,14 +14,11 @@ CONFIG_ENV_VAR = "VISUALIZER_CONFIG"
 
 
 @dataclass(frozen=True)
-class RunSettings:
-    data_path: str | None = None
-
-
-@dataclass(frozen=True)
 class AppSettings:
+    """Path layout: runs_root / <run_id> / run_data_path / *.parquet"""
+
     runs_root: Path
-    runs: dict[str, RunSettings] = field(default_factory=dict)
+    run_data_path: Path | None = None
 
 
 def _resolve_path(value: str | Path, *, base: Path) -> Path:
@@ -35,22 +32,15 @@ def _default_settings() -> AppSettings:
     return AppSettings(runs_root=DATA_DIR.resolve())
 
 
-def _parse_run_settings(raw_runs: Any) -> dict[str, RunSettings]:
-    if not isinstance(raw_runs, dict):
-        return {}
-    parsed: dict[str, RunSettings] = {}
-    for run_id, config in raw_runs.items():
-        if not isinstance(run_id, str) or not run_id.strip():
-            continue
-        data_path = None
-        if isinstance(config, dict):
-            value = config.get("data_path")
-            if isinstance(value, str) and value.strip():
-                data_path = value.strip()
-        elif isinstance(config, str) and config.strip():
-            data_path = config.strip()
-        parsed[run_id.strip()] = RunSettings(data_path=data_path)
-    return parsed
+def _parse_run_data_path(raw: Any) -> Path | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, str) or not raw.strip():
+        return None
+    segment = raw.strip()
+    if segment in (".", "./"):
+        return None
+    return Path(segment)
 
 
 def load_settings(config_path: Path | None = None) -> AppSettings:
@@ -69,8 +59,13 @@ def load_settings(config_path: Path | None = None) -> AppSettings:
 
     runs_root_raw = raw.get("runs_root", "data")
     runs_root = _resolve_path(str(runs_root_raw), base=BASE_DIR)
-    runs = _parse_run_settings(raw.get("runs"))
-    return AppSettings(runs_root=runs_root, runs=runs)
+
+    # Single subfolder inside every run directory (not per-run entries in YAML).
+    run_data_path = _parse_run_data_path(raw.get("run_data_path"))
+    if run_data_path is None:
+        run_data_path = _parse_run_data_path(raw.get("data_path"))
+
+    return AppSettings(runs_root=runs_root, run_data_path=run_data_path)
 
 
 def reload_settings() -> AppSettings:
@@ -88,24 +83,23 @@ def get_runs_root() -> Path:
 
 
 def list_run_ids() -> list[str]:
-    settings = get_settings()
-    runs_root = settings.runs_root
-    configured = set(settings.runs.keys())
-    discovered: set[str] = set()
-    if runs_root.is_dir():
-        for child in runs_root.iterdir():
-            if child.is_dir() and not child.name.startswith("."):
-                discovered.add(child.name)
-    return sorted(configured | discovered)
+    """Discover run folders directly under runs_root (no YAML run list)."""
+    runs_root = get_settings().runs_root
+    if not runs_root.is_dir():
+        return []
+    return sorted(
+        child.name
+        for child in runs_root.iterdir()
+        if child.is_dir() and not child.name.startswith(".")
+    )
 
 
 def get_run_data_dir(run_id: str) -> Path:
     settings = get_settings()
-    run_root = settings.runs_root / run_id
-    run_settings = settings.runs.get(run_id)
-    if run_settings and run_settings.data_path:
-        return _resolve_path(run_settings.data_path, base=run_root)
-    return run_root.resolve()
+    run_root = (settings.runs_root / run_id).resolve()
+    if settings.run_data_path is None:
+        return run_root
+    return _resolve_path(settings.run_data_path, base=run_root)
 
 
 def run_key_prefix(run_id: str) -> str:

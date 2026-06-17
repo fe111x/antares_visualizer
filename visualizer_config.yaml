@@ -1,9 +1,16 @@
-# Root folder with one subdirectory per Antares run (e.g. data/run_AT/).
+# Folder that contains one subdirectory per run (auto-discovered, not listed here).
 # Relative paths resolve from the project root; absolute paths are supported.
+#
+# Example (default — files directly in each run folder):
+#   runs_root: data
+#
+# Example (runs on a network share):
+#   runs_root: /mnt/antares/outputs
+#   run_data_path: results/hourly
+#
+# Layout:  <runs_root>/<run_id>/<run_data_path>/*.parquet
 runs_root: data
 
-# Optional per-run overrides when parquet/csv files live in a nested folder.
-# Any subfolder under runs_root is auto-discovered even if not listed here.
-runs:
-  run_AT:
-    data_path: .
+# Optional subfolder inside every run directory where parquet/csv files live.
+# Omit or set to "." when files sit directly in the run folder.
+# run_data_path: results/hourly

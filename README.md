@@ -16,7 +16,7 @@ Interactive Dash dashboard for exploring Antares model output files (`.parquet` 
 antares_visualizer/
   dashboard_app.py          # Entry point
   start_service.ps1         # Windows production start (Waitress)
-  visualizer_config.yaml    # runs_root and per-run data_path
+  visualizer_config.yaml    # runs_root + optional run_data_path
   dashboard/                # App code
   assets/                   # CSS
   data/                     # Your Antares outputs (not in git)
@@ -26,25 +26,42 @@ antares_visualizer/
 
 ## Data setup
 
-Place Antares output files under `data/`, one subdirectory per run:
+Runs are **auto-discovered** as subfolders of `runs_root`. You do not list individual runs in the YAML.
+
+### Default (project `data/` folder)
 
 ```text
 data/
   run_AT/
     *.parquet
   run_DE/
-    output/hourly/
-      *.parquet
+    *.parquet
 ```
-
-Every folder under `data/` is discovered automatically. Optional overrides go in `visualizer_config.yaml`:
 
 ```yaml
 runs_root: data
-runs:
-  run_DE:
-    data_path: output/hourly
 ```
+
+### External runs root with nested output folder
+
+When every run stores files in the same subfolder (e.g. `results/hourly/`):
+
+```text
+/mnt/antares/outputs/
+  run_AT/
+    results/hourly/
+      *.parquet
+  run_DE/
+    results/hourly/
+      *.parquet
+```
+
+```yaml
+runs_root: /mnt/antares/outputs
+run_data_path: results/hourly
+```
+
+`runs_root` may be absolute or relative to the project root. `run_data_path` is applied inside **every** run folder.
 
 Set a custom config path:
 
